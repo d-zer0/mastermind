@@ -1,7 +1,6 @@
 class Game
 
 	@@peg_colours = ["RED", "BLUE", "YELLOW", "GREEN"]
-	@pins = []
 	
 
 	def create_code
@@ -9,8 +8,8 @@ class Game
 		4.times do
 			@code << @@peg_colours.sample
 		end
-		colour_occurences = @code.each_with_object(Hash.new(0)) { |colour,counts| counts[colour] += 1 }
-		puts colour_occurences
+		@colour_occurences = @code.each_with_object(Hash.new(0)) { |colour,counts| counts[colour] += 1 }
+		puts @colour_occurences
 	end
 
 	def show_code
@@ -53,15 +52,26 @@ class Game
 	end
 
 	def check_pegs
+		colour_counter = @colour_occurences.clone
+
+		colour_counter.merge!(colour_counter) do |key, old_value, new_value|
+  			0
+		end
+
 		pins = []
 		@guess.each do |guess|
 			counter = 0
-
 			if @code.include?(guess)
-				if @code[counter] == @guess[counter]
-					pins << "O" # correct colour and position 
-				else
-					pins << "X" # correct colour but wrong position
+				if @code[counter] == @guess[counter] # correct colour and position
+					unless colour_counter[guess] >= @colour_occurences[guess]
+						pins << "O"
+						colour_counter[guess] += 1
+					end
+				elsif @code.include? guess
+					unless colour_counter[guess] >= @colour_occurences[guess]
+						pins << "X" # correct colour but wrong position
+						colour_counter[guess] += 1
+					end
 				end
 			end
 			counter += 1
@@ -69,6 +79,10 @@ class Game
 		until pins.length == 4
 			pins << "."
 		end
+
+		puts "Occur: " + @colour_occurences.to_s
+		puts "Count: " + colour_counter.to_s
+
 		puts
 		puts "#{pins[0]} #{pins[1]}"
 		puts "#{pins[2]} #{pins[3]}" 
@@ -88,5 +102,7 @@ class Game
 end
 
 game = Game.new
-#game.play
 game.create_code
+game.show_code
+game.guess_code
+game.check_pegs
