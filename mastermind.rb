@@ -9,7 +9,7 @@ class Game
 			@code << @@peg_colours.sample
 		end
 		@colour_occurences = @code.each_with_object(Hash.new(0)) { |colour,counts| counts[colour] += 1 }
-		puts @colour_occurences
+		# DELETE puts @colour_occurences
 	end
 
 	def show_code
@@ -25,8 +25,8 @@ class Game
 			print "Peg #{n+1}: "
 			guess_peg
 		end
-		puts "Code is " + @code.to_s
-		puts "Guessed:" + @guess.to_s
+		# DELETE puts "Code is " + @code.to_s
+		# DELETE puts "Guessed:" + @guess.to_s
 	end
 
 	def guess_peg
@@ -67,7 +67,7 @@ class Game
 
 		4.times do # check for full matches
 			if @code.include?(@guess[pos]) && @code[pos] == @guess[pos]
-				puts "Full match: #{@guess[pos]}"
+				# DELETE puts "Full match: #{@guess[pos]}"
 				pins << "O"
 				colour_counter[@guess[pos]] += 1
 			end
@@ -79,7 +79,7 @@ class Game
 		4.times do # check for colour matches
 			# if code includes colour and all colour occurences have not been accounted for and the colour is not in the right position
 			if @code.include?(@guess[pos]) && colour_counter[@guess[pos]] < @colour_occurences[@guess[pos]] && @code[pos] != @guess[pos]
-				puts "Colour match: #{@guess[pos]}"
+				# DELETE puts "Colour match: #{@guess[pos]}"
 				pins << "!"
 				colour_counter[@guess[pos]] += 1
 			end
@@ -90,79 +90,25 @@ class Game
 			pins << "."
 		end
 
-		puts
-		puts "#{pins[0]} #{pins[1]}"
-		puts "#{pins[2]} #{pins[3]}" 
+		puts @guess.join(" ") + " | " + pins.join(" ")
+
 	end
-
-
-=begin
-	def check_pegs
-		@guess.each do |peg|
-			position = 0
-			if @code.include?(peg)
-				if @code[position] == @guess[position]
-					puts "Full match: #{peg}"
-				else
-					puts "Colour match: #{peg}"
-				end
-			else
-				puts "No match: #{peg}"
-			end
-			position += 1
-		end
-	end
-=end
-
-=begin
-
-	def check_pegs
-		colour_counter = @colour_occurences.clone
-
-		colour_counter.merge!(colour_counter) do |key, old_value, new_value|
-  			0
-		end
-
-		pins = []
-
-		@guess.each do |guess|
-			counter = 0
-			if @code.include?(guess)
-				if @code[counter] == @guess[counter] # correct colour and position
-					if colour_counter[guess] <= colour_occurences[guess]
-						pins << "O"
-						colour_counter[guess] += 1
-					end
-				elsif @code.include?(guess)
-					if colour_counter[guess] <= @colour_occurences[guess]
-						pins << "X" # correct colour but wrong position
-						colour_counter[guess] += 1
-					end
-				end
-			end
-			counter += 1
-		end
-		until pins.length == 4
-			pins << "."
-		end
-
-		puts "Occur: " + @colour_occurences.to_s
-		puts "Count: " + colour_counter.to_s
-
-		puts
-		puts "#{pins[0]} #{pins[1]}"
-		puts "#{pins[2]} #{pins[3]}" 
-	end
-
-=end
 
 	def play
 		create_code
-		until @victory == true
-			show_code
+		@turn = 0
+		until @victory == true || @turn > 12
+			# DELETE show_code
+			puts
+			puts "Turn #{@turn} of 12"
 			guess_code
 			check_for_victory
 			check_pegs
+			@turn += 1
+			if @turn > 12
+				puts
+				puts "You lose!"
+			end
 		end
 	end
 
