@@ -51,6 +51,58 @@ class Game
 		end
 	end
 
+# Go through each peg in the guess and see if it's colour matches that of any pegs in the code.
+# If it does, see if it is also in the same position as any pegs of that colour. If it is, show
+# a "O" pin. If it isn't but the colour is found in the code, show an "X" pin, but only if all
+# pegs of that colour have not already been guessed. Fill remaining pin spaces with ".".
+	
+	def check_pegs
+		colour_counter = @colour_occurences.clone # creates a new hash from colour_occurences
+		colour_counter.merge!(colour_counter) do |key, old_value, new_value|
+  			0 # sets all values of colour_counter to 0
+		end
+		pins = []
+		pos = 0
+		4.times do
+			if @code.include?(@guess[pos])
+				if @code[pos] == @guess[pos]
+					puts "Full match: #{@guess[pos]}"
+				else
+					if colour_counter[@guess[pos]] <= @colour_occurences[@guess]
+						puts "Colour match: #{@guess[pos]}"
+					else
+						puts "No match: #{@guess[pos]}"
+					end
+				end
+				colour_counter[@guess[pos]] += 1
+			else
+				puts "No match: #{@guess[pos]}"
+			end
+			pos += 1
+		end
+	end
+
+
+=begin
+	def check_pegs
+		@guess.each do |peg|
+			position = 0
+			if @code.include?(peg)
+				if @code[position] == @guess[position]
+					puts "Full match: #{peg}"
+				else
+					puts "Colour match: #{peg}"
+				end
+			else
+				puts "No match: #{peg}"
+			end
+			position += 1
+		end
+	end
+=end
+
+=begin
+
 	def check_pegs
 		colour_counter = @colour_occurences.clone
 
@@ -59,16 +111,17 @@ class Game
 		end
 
 		pins = []
+
 		@guess.each do |guess|
 			counter = 0
 			if @code.include?(guess)
 				if @code[counter] == @guess[counter] # correct colour and position
-					unless colour_counter[guess] >= @colour_occurences[guess]
+					if colour_counter[guess] <= colour_occurences[guess]
 						pins << "O"
 						colour_counter[guess] += 1
 					end
-				elsif @code.include? guess
-					unless colour_counter[guess] >= @colour_occurences[guess]
+				elsif @code.include?(guess)
+					if colour_counter[guess] <= @colour_occurences[guess]
 						pins << "X" # correct colour but wrong position
 						colour_counter[guess] += 1
 					end
@@ -88,6 +141,8 @@ class Game
 		puts "#{pins[2]} #{pins[3]}" 
 	end
 
+=end
+
 	def play
 		create_code
 		until @victory == true
@@ -102,7 +157,4 @@ class Game
 end
 
 game = Game.new
-game.create_code
-game.show_code
-game.guess_code
-game.check_pegs
+game.play
